@@ -16,3 +16,9 @@ body {
 textarea {
   height: 250px;
 }
+
+.logo-img {
+    width: 96px;
+    height: 96px;
+    object-fit: contain;
+}

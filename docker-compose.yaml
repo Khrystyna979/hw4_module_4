@@ -1,0 +1,9 @@
+services: 
+  app: 
+    build: . 
+    container_name: my_web_app_compose
+    ports:
+      - "3000:3000" 
+      - "5000:5000/udp" 
+    volumes:
+      - ./storage:/app/storage 

@@ -1,4 +1,4 @@
-# Не забути видалі мої коментарі коли буду надсилати домашку ментору !!!!!
+# Не забути видалі мої коментарі !!!!!
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
@@ -31,14 +31,15 @@ class HttpHandler(BaseHTTPRequestHandler):
         pr_url = urllib.parse.urlparse(self.path) # Витягуємо із юрл чистий шлях
         match pr_url.path: # Розбиваємо маршрутизацію
             case '/':
-                self.send_html_file('./index.html')
+                self.send_html_file('front-init/index.html')
             case '/message':
-                self.send_html_file('./message.html')
+                self.send_html_file('front-init/message.html')
             case _:
-                if pathlib.Path().joinpath(pr_url.path[1:]).exists(): #перевіряємо чи інстує у нас потрібний ресурс та надсилаємо його
+                resource_path = pathlib.Path('front-init').joinpath(pr_url.path[1:])
+                if resource_path.exists(): 
                     self.send_static()
                 else:
-                    self.send_html_file('./error.html', 404)
+                    self.send_html_file('front-init/error.html', 404)
                     
     def do_POST(self):
         """Process an incoming HTTP POST request.
@@ -87,7 +88,8 @@ class HttpHandler(BaseHTTPRequestHandler):
         else:
             self.send_header("Content-type", 'text/plain') # Якщо розширення немає ми кажемо що це простий текст
         self.end_headers() # Фіналізуємо заголовок
-        with open(f'.{self.path}', 'rb') as file: # Відкриваємо ресурс за шляхом, {self.path} в нашому випадку це до прикладу 
+        file_path = pathlib.Path('front-init').joinpath(self.path[1:])
+        with open(file_path, 'rb') as file: # Відкриваємо ресурс за шляхом, {self.path} в нашому випадку це до прикладу 
                                                 # /style.css, тому ми ставимо . щоб знайти шлях в цій папці
             self.wfile.write(file.read()) # зберігаємо в опер память та надсилаємо в наш канал зв'язку   
                
@@ -104,7 +106,7 @@ def save_data_from_form(data: bytes, file_path: str):
     """  
     data_parse = urllib.parse.unquote_plus(data.decode()) # unquote_plus ця функція повертає у людський вигляд запис, але частини форми будуть розділені '&'
     try:
-        data_dict = {key: value for key, value in [el.split('=') for el in data_parse.split('&')]} # Створює словник та розділяє ключі та значення
+        data_dict = {key: value for key, value in [el.split('=', 1) for el in data_parse.split('&')]} # Створює словник та розділяє ключі та значення
         time = str(datetime.now())
         message = {time: data_dict} # Створюємо словник із часом та словником юсер + повідомлення
         print(message)
